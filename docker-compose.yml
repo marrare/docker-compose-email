@@ -9,7 +9,13 @@ services:
             - dados:/var/lib/postgresql/data
             # Scripts
             - ./scripts:/scripts
-            - ./scripts/init.sql:/docker-entrypoint-initdb.d/init.sql
+            - ./scripts/init.sql:/docker-entrypoint-initdb.d/init.sql #Permite executar script na inicialização do banco
         environment:
             POSTGRES_PASSWORD: postgres
-        
+    frontend:
+        image: nginx:1.13
+        volumes:
+            # Site
+            - ./web:/usr/share/nginx/html/
+        ports:
+            - 8000:80
