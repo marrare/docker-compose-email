@@ -1,6 +1,9 @@
 version: '3'
 volumes:
     dados:
+networks: 
+    banco:
+    web:
 services: 
     db:
         image: postgres:9.6
@@ -12,6 +15,8 @@ services:
             - ./scripts/init.sql:/docker-entrypoint-initdb.d/init.sql #Permite executar script na inicialização do banco
         environment:
             POSTGRES_PASSWORD: postgres
+        networks: 
+            - banco
     frontend:
         image: nginx:1.13
         volumes:
@@ -21,10 +26,19 @@ services:
             - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
         ports:
             - 8000:80
+        networks: 
+            - web
+        depends_on: #
+            - app
     app:
         image: python:3.6
         volumes: 
             # Aplicação
             - ./app:/app
         working_dir: /app
-        command: bash ./app.sh
+        command: bash ./app.sh #Comando será executado dentro do working_dir
+        networks:
+            - banco
+            - web
+        depends_on: 
+            - db
